@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>weather website</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div class="card">
+		<div class="search">
+			<input type="text" placeholder="enter city name" spellcheck="false" name="">
+			<button><img src="images/search.png"></button>
+		</div>
+		<div class="error">
+			<p>city name Undefined</p>
+		</div>
+		<div class="weather">
+			<img src="images/rain.png" class="weather-icon">
+			<h1 class="temp">22°c</h1>
+			<h2 class="city">New York</h2>
+			<div class="details">
+				<div class="col">
+					<img src="images/humidity.png">
+				<div>
+					<p class="humidity">50%</p>
+					<p>Humidity</p>
+				</div>
+				</div>
+				<div class="col">
+					<img src="images/wind.png">
+				<div>
+					<p class="wind">15 Km/hr</p>
+					<p>Wind Speed</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	
+ const apiKey = "7bf660e6bcc1d750855bf027e6b6fe9f";  
+ //key from openWeatherMap to access weather data.
+
+const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+ // url to fetch weather data in metric umits (c).the city name enter and api request 
+
+const searchBox = document.querySelector(".search input");
+//for the user input city name
+
+const searchBtn = document.querySelector(".search button");
+//for button when click tp triggers
+
+const weatherIcon = document.querySelector(".weather-icon");
+//for images that display on the basis of weather
+
+async function CheckWeather(city){					//makes function asychronous so we use await.
+	try{
+	const response = await fetch(apiUrl + city + `&appid=${apiKey}`);		//send request, await do wait
+
+	if (response.status == 404) {
+		document.querySelector(".error").style.display = "block";
+		document.querySelector(".weather").style.display = "block";
+	} else {
+		var data = await response.json();		//convert raw response from server into js object(data).
+
+	console.log(data); 			//to see what data received from api.
+
+
+	document.querySelector(".city").innerHTML = data.name; 		// acces and update html elements
+	document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°c";
+	document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+	document.querySelector(".wind").innerHTML = data.wind.speed + " km/h";
+
+	if (data.weather[0].main == "Clouds") {  	//for images adding, "weather[0].main" is console result
+		weatherIcon.src = "images/clouds.png";
+	}
+	else if (data.weather[0].main == "Clear") {
+		weatherIcon.src = "images/clear.png";
+	}
+	else if (weather.data[0].main == "Rain") {
+		weatherIcon.src = "images/rain.png";
+	}
+	else if (weather.data[0].main == "Drizzle") {
+		weatherIcon.src = "images/drizzle.png";
+	}
+	else if (weather.data[0].main == "Mist") {
+		weatherIcon.src = "images/mist.png";
+	}
+
+	document.querySelector(".weather").style.display = "block";
+	document.querySelector(".error").style.display = "none";
+
+	}
+
+	if (!response.ok) {			//if city donot exist or api problem
+		throw new Error("city not found");
+	}
+	
+
+} catch (error) {			//the catch block capture error and show alert
+	alert(error.message);
+}
+}
+
+searchBtn.addEventListener("click", ()=>{ 	//runs checkWeather() function when btn is clicked
+	const city = searchBox.value.trim();	//romoves extra space from input
+	if (city !==""){
+		CheckWeather(city);
+	} else {
+		alert("plz enter city name.");	//if input empty alert asks enter name city/
+	}
+});
+
+
+</script>
+
+<!--
+Complete flow:
+1. enter city name 
+2.click search btn.
+3.CheckWeather() fetch data from api.
+4.if city exist, update on page.
+5.if not, show error alert.
+
+
+js concept:
+fetch(), async/await, try/catch
+DOM: event listener 
+document.querySelector, innerHTML
+-->
+
+
+
+</body>
+</html>
